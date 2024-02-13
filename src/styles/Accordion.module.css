@@ -77,10 +77,21 @@
 }
 
 .options {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   display: flex;
   justify-content: flex-end;
   align-items: center;
+}
+
+.options button {
+  padding: 0.15rem 0.25rem;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.options button:disabled {
+  cursor: not-allowed;
 }
 
 .input,
@@ -158,6 +169,8 @@
   .accordion-item,
   .search-container {
     width: 100%;
+  }
+  .accordion-item {
     padding-inline: 0.75rem;
   }
 }

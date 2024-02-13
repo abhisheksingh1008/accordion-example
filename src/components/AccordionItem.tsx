@@ -1,4 +1,4 @@
-import { FC, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import classes from "../styles/Accordion.module.css";
 import { RxCross2 } from "react-icons/rx";
 import { MdModeEdit } from "react-icons/md";
@@ -28,17 +28,19 @@ const AccordionItem: FC<AccordionItemProps> = ({
   onDelete,
   editingEnabled,
 }) => {
-  const [ageInYears, setAgeInYears] = useState<number>(
+  let [ageInYears, setAgeInYears] = useState<number>(
     calculateAge(celebrity.dob)
   );
   const [editing, setEditing] = useState<Boolean>(false);
   const [name, setName] = useState<string>(
     celebrity.first + " " + celebrity.last
   );
+  const [age, setAge] = useState<number>(ageInYears);
   const [gender, setGender] = useState<string>(celebrity.gender);
   const [country, setCountry] = useState<string>(celebrity.country);
   const [description, setDescription] = useState<string>(celebrity.description);
-  const [showModal, setShowModal] = useState<Boolean>(false);
+  const [changesMade, setChangesMade] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const deleteButtonHandler = (
     e: React.MouseEvent<HTMLSpanElement, MouseEvent>
@@ -87,10 +89,28 @@ const AccordionItem: FC<AccordionItemProps> = ({
       celebrity.gender = gender as Gender;
       celebrity.country = country.trim();
       celebrity.description = description.trim();
+      setAgeInYears(age);
       setEditing(false);
       editingEnabled(null);
+      setChangesMade(false);
     }
   };
+
+  useEffect(() => {
+    const [fname, lname] = name.trim().split(" ");
+    if (
+      celebrity.first !== fname ||
+      celebrity.last !== lname ||
+      ageInYears !== age ||
+      celebrity.gender != gender ||
+      celebrity.country !== country.trim() ||
+      celebrity.description !== description.trim()
+    ) {
+      setChangesMade(true);
+    } else {
+      setChangesMade(false);
+    }
+  }, [name, age, gender, country, description]);
 
   return (
     <>
@@ -145,11 +165,11 @@ const AccordionItem: FC<AccordionItemProps> = ({
                 <input
                   required
                   type="number"
-                  value={ageInYears}
+                  value={age}
                   min={1}
                   className={`${classes["details-input"]} ${classes.input}`}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    setAgeInYears(+e.target.value);
+                    setAge(+e.target.value);
                   }}
                 />
               ) : (
@@ -230,29 +250,29 @@ const AccordionItem: FC<AccordionItemProps> = ({
           <div className={classes.options}>
             {editing ? (
               <>
-                <span onClick={cancelButtonHandler}>
+                <button onClick={cancelButtonHandler}>
                   <RxCross2 size="1.5rem" color="red" />
-                </span>
-                <span onClick={saveButtonHandler}>
-                  <IoCheckmarkCircleOutline
-                    size="1.5rem"
-                    color="green"
-                    style={{ marginInline: "0.75rem" }}
-                  />
-                </span>
+                </button>
+                <button
+                  disabled={!changesMade}
+                  onClick={saveButtonHandler}
+                  style={{ marginLeft: "0.5rem" }}
+                >
+                  <IoCheckmarkCircleOutline size="1.5rem" color="green" />
+                </button>
               </>
             ) : (
               <>
-                <span onClick={deleteButtonHandler}>
+                <button onClick={deleteButtonHandler}>
                   <RiDeleteBin6Line size="1.25rem" color="red" />
-                </span>
+                </button>
                 {ageInYears >= 18 && (
-                  <span onClick={editButtonHandler}>
-                    <MdModeEdit
-                      size="1.25rem"
-                      style={{ marginInline: "0.75rem" }}
-                    />
-                  </span>
+                  <button
+                    onClick={editButtonHandler}
+                    style={{ marginLeft: "0.75rem" }}
+                  >
+                    <MdModeEdit size="1.25rem" />
+                  </button>
                 )}
               </>
             )}
