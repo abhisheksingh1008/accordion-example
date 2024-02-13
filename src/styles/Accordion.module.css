@@ -1,0 +1,163 @@
+.accordion {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1.4rem;
+}
+
+.accordion-item {
+  margin-block: 0.5rem;
+  border: 1px solid #ccc;
+  width: 40%;
+  border-radius: 12px;
+  cursor: pointer;
+  padding-inline: 1.1rem;
+  padding-block: 0.8rem;
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.avatar-container {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid #ccc;
+  overflow: hidden;
+  margin-right: 1rem;
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: scale-down;
+}
+
+.name {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.toggle-icon {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.details {
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0, 1, 0, 1);
+}
+
+.details.show {
+  max-height: 999px;
+  transition: all 0.4s cubic-bezier(1, 0, 1, 0);
+}
+
+.celebrity-info {
+  display: flex;
+  justify-content: space-between;
+  margin-block: 1rem;
+  gap: 0.3rem;
+}
+
+.info-title {
+  color: #807f7f;
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.options {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.input,
+.search-input {
+  padding: 0.5rem;
+  border-radius: 12px;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+  width: 100%;
+}
+
+.search-container {
+  margin-top: 1rem;
+  margin-inline: auto;
+  text-align: center;
+  position: relative;
+  padding-inline: 0.5rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  padding-left: 2.25rem;
+  border: 1px solid #858585;
+}
+
+.search-icon {
+  position: absolute;
+  left: 21px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #555454;
+}
+
+.details-input,
+.description-input {
+  margin-top: 0.25rem;
+}
+
+.description-input {
+  width: 97%;
+  padding: 0.3rem;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+}
+
+@media only screen and (max-width: 1400px) {
+  .accordion-item {
+    width: 40%;
+  }
+  .search-container {
+    width: 41.25%;
+  }
+}
+
+@media only screen and (max-width: 900px) {
+  .accordion-item,
+  .search-container {
+    width: 60%;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .accordion-item,
+  .search-container {
+    width: 65%;
+  }
+}
+
+@media only screen and (max-width: 520px) {
+  .accordion-item,
+  .search-container {
+    width: 100%;
+    padding-inline: 0.75rem;
+  }
+}

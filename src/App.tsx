@@ -1,24 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import { Toaster } from "react-hot-toast";
+import { BsSearch } from "react-icons/bs";
+import Accordion from "./components/Accordion";
+import classes from "./styles/Accordion.module.css";
+import "./App.css";
 
 function App() {
+  const [search, setSearch] = useState<string>("");
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Toaster position="top-center" reverseOrder={false} />
+      <div className={classes["search-container"]}>
+        <BsSearch className={classes["search-icon"]} />
+        <input
+          type="text"
+          value={search}
+          placeholder="Search user"
+          className={classes["search-input"]}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setSearch(e.target.value);
+          }}
+        />
+      </div>
+      <Accordion search={search} />
     </div>
   );
 }
