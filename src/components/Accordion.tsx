@@ -68,11 +68,14 @@ const Accordion: FC<AccordionProps> = ({ search }) => {
 
   const debounceFunc = debounce((value: string) => {
     setCelebrities(
-      allCelebrities.filter(
-        (c) =>
-          c.first.toLowerCase().includes(value.toLowerCase()) ||
-          c.last.toLowerCase().includes(value.toLowerCase())
-      )
+      allCelebrities.filter((c) => {
+        const userName = c.first + " " + c.last;
+        if (
+          userName.toLowerCase().includes(value.toLowerCase()) ||
+          userName.toLowerCase().includes(value.toLowerCase())
+        )
+          return c;
+      })
     );
   }, 0);
 
