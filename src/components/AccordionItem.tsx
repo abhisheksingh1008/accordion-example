@@ -32,7 +32,10 @@ const AccordionItem: FC<AccordionItemProps> = ({
     calculateAge(celebrity.dob)
   );
   const [editing, setEditing] = useState<Boolean>(false);
-  const [name, setName] = useState<string>(
+  const [userName, setUserName] = useState<string>(
+    celebrity.first + " " + celebrity.last
+  );
+  const [enteredName, setEnteredName] = useState<string>(
     celebrity.first + " " + celebrity.last
   );
   const [age, setAge] = useState<number>(ageInYears);
@@ -78,17 +81,15 @@ const AccordionItem: FC<AccordionItemProps> = ({
     }
 
     if (
-      name.trim().length > 0 &&
+      enteredName.trim().length > 0 &&
       country.trim().length > 0 &&
       description.trim().length > 0 &&
       !countryContainsNumbers
     ) {
-      const [fname, lname] = name.trim().split(" ");
-      celebrity.first = fname;
-      celebrity.last = lname;
       celebrity.gender = gender as Gender;
       celebrity.country = country.trim();
       celebrity.description = description.trim();
+      setUserName(enteredName.trim());
       setAgeInYears(age);
       setEditing(false);
       editingEnabled(null);
@@ -97,10 +98,8 @@ const AccordionItem: FC<AccordionItemProps> = ({
   };
 
   useEffect(() => {
-    const [fname, lname] = name.trim().split(" ");
     if (
-      celebrity.first !== fname ||
-      celebrity.last !== lname ||
+      userName !== enteredName.trim() ||
       ageInYears !== age ||
       celebrity.gender != gender ||
       celebrity.country !== country.trim() ||
@@ -110,7 +109,7 @@ const AccordionItem: FC<AccordionItemProps> = ({
     } else {
       setChangesMade(false);
     }
-  }, [name, age, gender, country, description]);
+  }, [enteredName, age, gender, country, description]);
 
   return (
     <>
@@ -134,10 +133,10 @@ const AccordionItem: FC<AccordionItemProps> = ({
               <input
                 required
                 type="text"
-                value={name}
+                value={enteredName}
                 className={`${classes["name-input"]} ${classes.input}`}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  setName(e.target.value);
+                  setEnteredName(e.target.value);
                 }}
                 style={{
                   fontSize: "1.25rem",
@@ -146,9 +145,7 @@ const AccordionItem: FC<AccordionItemProps> = ({
                 }}
               />
             ) : (
-              <span className={classes.name}>
-                {`${celebrity.first} ${celebrity.last}`}
-              </span>
+              <span className={classes.name}>{userName}</span>
             )}
           </div>
           <span className={classes["toggle-icon"]}>{selected ? "-" : "+"}</span>

@@ -69,7 +69,9 @@ const Accordion: FC<AccordionProps> = ({ search }) => {
   const debounceFunc = debounce((value: string) => {
     setCelebrities(
       allCelebrities.filter(
-        (c) => c.first.includes(value) || c.last.includes(value)
+        (c) =>
+          c.first.toLowerCase().includes(value.toLowerCase()) ||
+          c.last.toLowerCase().includes(value.toLowerCase())
       )
     );
   }, 0);
