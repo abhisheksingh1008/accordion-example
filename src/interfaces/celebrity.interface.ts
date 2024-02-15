@@ -2,9 +2,8 @@ import Gender from "../types/gender.type";
 
 export default interface Celebrity {
   id: number;
-  first: string;
-  last: string;
-  dob: string;
+  name: string;
+  age: number;
   gender: Gender;
   email: string;
   picture: string;

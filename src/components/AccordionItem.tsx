@@ -1,44 +1,33 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import classes from "../styles/Accordion.module.css";
 import { RxCross2 } from "react-icons/rx";
 import { MdModeEdit } from "react-icons/md";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { IoCheckmarkCircleOutline } from "react-icons/io5";
 import Celebrity from "../interfaces/celebrity.interface";
-import Gender from "../types/gender.type";
-import { calculateAge } from "../utils/helperFunctions";
 import ReactTextareaAutosize from "react-textarea-autosize";
 import toast from "react-hot-toast";
 import DeleteItemModal from "./DeleteItemModal";
+import { useDispatch, useSelector } from "react-redux";
+import { actions } from "../store/celebritySlice";
 
 type AccordionItemProps = {
-  i: number;
-  selected: Boolean;
   celebrity: Celebrity;
-  onClick: (i: number) => void;
-  onDelete: (c: Celebrity) => void;
-  editingEnabled: (c: Celebrity | null) => void;
+  onClick: (c: Celebrity) => void;
 };
 
 const AccordionItem: FC<AccordionItemProps> = ({
-  i,
-  selected,
   celebrity,
   onClick,
-  onDelete,
-  editingEnabled,
 }) => {
-  let [ageInYears, setAgeInYears] = useState<number>(
-    calculateAge(celebrity.dob)
-  );
+  const dispatch = useDispatch();
+  const { selectedCelebrity, celebrityBeingEdited } = useSelector((state: any) => state.celebrity)
+
   const [editing, setEditing] = useState<Boolean>(false);
-  const [userName, setUserName] = useState<string>(
-    celebrity.first + " " + celebrity.last
-  );
   const [enteredName, setEnteredName] = useState<string>(
-    celebrity.first + " " + celebrity.last
+    celebrity.name
   );
-  const [age, setAge] = useState<number>(ageInYears);
+  const [age, setAge] = useState<number>(celebrity.age);
   const [gender, setGender] = useState<string>(celebrity.gender);
   const [country, setCountry] = useState<string>(celebrity.country);
   const [description, setDescription] = useState<string>(celebrity.description);
@@ -50,7 +39,6 @@ const AccordionItem: FC<AccordionItemProps> = ({
   ) => {
     e.stopPropagation();
     setShowModal(true);
-    editingEnabled(null);
   };
 
   const editButtonHandler = (
@@ -58,7 +46,7 @@ const AccordionItem: FC<AccordionItemProps> = ({
   ) => {
     e.stopPropagation();
     setEditing(true);
-    editingEnabled(celebrity);
+    dispatch(actions.setCelebrityBeingEdited({ celebrity: celebrity }));
   };
 
   const cancelButtonHandler = (
@@ -66,14 +54,13 @@ const AccordionItem: FC<AccordionItemProps> = ({
   ) => {
     e.stopPropagation();
     setEditing(false);
-    editingEnabled(null);
+    dispatch(actions.setCelebrityBeingEdited({ celebrity: null }))
   };
 
   const saveButtonHandler = (
     e: React.MouseEvent<HTMLSpanElement, MouseEvent>
   ) => {
     e.stopPropagation();
-
     const countryContainsNumbers = /\d/.test(country);
     if (countryContainsNumbers) {
       toast.error("Country cannot consist of numbers.");
@@ -81,29 +68,37 @@ const AccordionItem: FC<AccordionItemProps> = ({
     }
 
     if (
-      enteredName.trim().length > 0 &&
-      country.trim().length > 0 &&
-      description.trim().length > 0 &&
+      changesMade &&
+      enteredName?.trim().length > 0 &&
+      country?.trim().length > 0 &&
+      description?.trim().length > 0 &&
       !countryContainsNumbers
     ) {
-      celebrity.gender = gender as Gender;
-      celebrity.country = country.trim();
-      celebrity.description = description.trim();
-      setUserName(enteredName.trim());
-      setAgeInYears(age);
+      dispatch(actions.updateCelebrity({
+        celebrity: {
+          id: celebrity.id,
+          name: enteredName,
+          age: age,
+          gender: gender,
+          country: country,
+          email: celebrity.email,
+          description: description,
+          picture: celebrity.picture,
+        }
+      }));
       setEditing(false);
-      editingEnabled(null);
       setChangesMade(false);
+      dispatch(actions.setCelebrityBeingEdited({ celebrity: null }));
     }
   };
 
   useEffect(() => {
     if (
-      userName !== enteredName.trim() ||
-      ageInYears !== age ||
+      celebrity.name !== enteredName?.trim() ||
+      celebrity.age !== age ||
       celebrity.gender != gender ||
-      celebrity.country !== country.trim() ||
-      celebrity.description !== description.trim()
+      celebrity.country !== country?.trim() ||
+      celebrity.description !== description?.trim()
     ) {
       setChangesMade(true);
     } else {
@@ -117,7 +112,7 @@ const AccordionItem: FC<AccordionItemProps> = ({
         className={classes["accordion-item"]}
         onClick={() => {
           if (editing) return;
-          onClick(i);
+          onClick(celebrity);
         }}
       >
         <div className={classes.title}>
@@ -145,14 +140,14 @@ const AccordionItem: FC<AccordionItemProps> = ({
                 }}
               />
             ) : (
-              <span className={classes.name}>{userName}</span>
+              <span className={classes.name}>{celebrity.name}</span>
             )}
           </div>
-          <span className={classes["toggle-icon"]}>{selected ? "-" : "+"}</span>
+          <span className={classes["toggle-icon"]}>{selectedCelebrity?.id === celebrity?.id ? "-" : "+"}</span>
         </div>
         <div
           className={
-            selected ? `${classes.details} ${classes.show}` : classes.details
+            selectedCelebrity?.id === celebrity?.id ? `${classes.details} ${classes.show}` : classes.details
           }
         >
           <div className={classes["celebrity-info"]}>
@@ -170,7 +165,7 @@ const AccordionItem: FC<AccordionItemProps> = ({
                   }}
                 />
               ) : (
-                <div className={classes["info"]}>{ageInYears} Years</div>
+                <div className={classes["info"]}>{celebrity.age} Years</div>
               )}
             </div>
             <div>
@@ -182,29 +177,25 @@ const AccordionItem: FC<AccordionItemProps> = ({
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                     setGender(e.target.value);
                   }}
+                  defaultValue={celebrity.gender}
                 >
-                  <option value="male" selected={celebrity.gender == "male"}>
+                  <option value="male">
                     male
                   </option>
-                  <option
-                    value="female"
-                    selected={celebrity.gender == "female"}
+                  <option value="female"
                   >
                     female
                   </option>
-                  <option
-                    value="transgender"
-                    selected={celebrity.gender == "transgender"}
+                  <option value="transgender"
                   >
                     transgender
                   </option>
                   <option
                     value="rather not say"
-                    selected={celebrity.gender == "rather not say"}
                   >
                     rather not say
                   </option>
-                  <option value="other" selected={celebrity.gender == "other"}>
+                  <option value="other">
                     other
                   </option>
                 </select>
@@ -263,7 +254,7 @@ const AccordionItem: FC<AccordionItemProps> = ({
                 <button onClick={deleteButtonHandler}>
                   <RiDeleteBin6Line size="1.25rem" color="red" />
                 </button>
-                {ageInYears >= 18 && (
+                {celebrity.age >= 18 && (
                   <button
                     onClick={editButtonHandler}
                     style={{ marginLeft: "0.75rem" }}
@@ -279,7 +270,8 @@ const AccordionItem: FC<AccordionItemProps> = ({
       {showModal && (
         <DeleteItemModal
           onDelete={() => {
-            onDelete(celebrity);
+            dispatch(actions.deleteCelebrity({ celebrity: celebrity }))
+            dispatch(actions.setSelectedCelebrity({ celebrity: null }))
           }}
           closeModal={() => setShowModal(false)}
         />
